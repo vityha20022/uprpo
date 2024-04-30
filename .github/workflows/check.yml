@@ -1,0 +1,31 @@
+# .github/workflows/check.yml
+name: pycodestyle check
+
+on: [ push ]
+
+jobs:
+  check_files:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Python setup
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.9
+    # install requirements
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+    # install pycodestyle
+    - name: Install pycodestyle
+      run: pip install pycodestyle
+    # check .py files
+    - name: Check code style
+      run: |
+          errors=$(pycodestyle --ignore=E226 count_words.py)
+          if [ -n "$errors" ]; then
+            echo "Code style errors found:"
+            echo "$errors"
+            exit 1
+          fi
